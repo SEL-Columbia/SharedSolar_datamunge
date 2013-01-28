@@ -29,7 +29,7 @@ pd.set_option('display.notebook_repr_html', False)
 
 # <codecell>
 
-demdata = pd.read_csv('allmetersdemandarray.csv', delimiter=',',index_col =0,parse_dates = True)
+demdata = pd.read_csv('allmetersdemandarray2.csv', delimiter=',',index_col =0,parse_dates = True)
 # If the hourly demand is greater than 1000 Wh replace with nan
 demdata[demdata >= 1000] = np.nan
 demdatacum = pd.read_csv('allmeterscumdemandarray.csv', delimiter=',',index_col =0,parse_dates = True)
@@ -63,7 +63,7 @@ circuitsdf = demdata[circuits]
 
 # <codecell>
 
-main2plot = demdata['ug01_0'].dropna()
+main2plot = demdata['ug03_0'].dropna()
 main2plot = pd.Series.order(main2plot, ascending = False)
 length = np.shape(main2plot)[0]
 
@@ -75,11 +75,16 @@ for ix,val in enumerate(main2plot):
         bar_color.append('r')
     else:
         bar_color.append('b')
-            
+"""            
 plt.bar(range(0,length),main2plot, color = bar_color)
 plt.ylabel('Hourly Energy (Wh)')
 plt.title('Load Duration Curve (Blue = Night, Red = Day)')
+"""
 
-
-
+# Line Plot Version
+plt.plot(np.arange(0.,float(length))/length,main2plot)
+plt.ylabel('Hourly Energy (Wh)')
+plt.xlabel('Percentage of Time Above')
+plt.title('Load Duration Curve')
+plt.show()
 

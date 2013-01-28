@@ -93,7 +93,7 @@ densityplot.set_xlabel('Mains and Circuits')
 densityplot.set_ylabel('Date and Time')
 densityplot.set_title('Data Availablity at Hourly Resolution')
 plt.show()
-"""
+
 # <headingcell level=2>
 
 # Plot the sparsenesss of the shared solar data MONTHLY RESOLUTION
@@ -191,7 +191,7 @@ cdemhisto =  fig.add_subplot(1,1,1)
 cdemhisto.hist(circdf_month_nonnan ,bins = 20, histtype='bar',range = (0,500))
 cdemhisto.set_xlabel('Average Daily Energy Consumption (Wh)')
 cdemhisto.set_ylabel('Number of Consumer Circuits')
-cdemhisto.set_title('Histogram of Consumers by Daily Energy Consumption (Wh)')
+cdemhisto.set_title('Histogram of Consumers by Mean Daily Energy Consumption (Wh)')
 plt.show()
 
 # <headingcell level=3>
@@ -214,7 +214,7 @@ plt.show()
 
 # <codecell>
 
-ts = Series(demdata['ml08_0'])   #.dropna())
+ts = Series(demdata['ml06_0'])   #.dropna())
 fig = plt.figure()
 tsplt =  fig.add_subplot(1,1,1)
 
@@ -224,6 +224,7 @@ ts.plot()
 tsplt.set_xlabel('Time Series')
 tsplt.set_ylabel('Energy (Wh)')
 plt.show()
+"""
 # <codecell>
 
 
