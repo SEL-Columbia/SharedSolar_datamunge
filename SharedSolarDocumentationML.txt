@@ -12,7 +12,12 @@ Shared Solar Documentation
 		The columns are of each circuit. Contains the data from the Uganda SD card 
 		dump that occurred in November 2012. The indexes are all hours between
 		1/1/2010 00:00 and 12/31/2012 23:00. 
-		
+	
+	allmetercreditarray_merged.csv. - the union of allmetercreditarray.csv and 
+		allmetercreditarray2.csv. If there are conflicting data values for 
+		a single time/(main or circuit) combination allmetercreditrray2.csv
+		is given precident. 
+	
 	allmetercumdemandarray.csv - csv of the accumulative demand from the 
 		DataFrame created by hourly2matDF.py.
 		Contains all Mali data up to March 2012, and Uganda data up until June 2012.
@@ -38,6 +43,11 @@ Shared Solar Documentation
 		dump that occurred in November 2012. 
 		The indexes are all hours between 1/1/2010 00:00 and 12/31/2012 23:00.	
 	
+	allmeterdemandarray_merged.csv. - the union of allmeterdemandarray.csv and 
+		allmeterdemandarray2.csv. If there are conflicting data values for 
+		a single time/(main or circuit) combination allmeterdemandarray2.csv
+		is given precident. 
+
 	master_hourly_data.csv - The csv files used by basicstats_master_hourly_data.py 
 		The first four columns contain the hierarchial indexing. These indices 
 		are country, site, circuit, and date. The next two columns are wh and credit.
@@ -514,11 +524,11 @@ System Optimization Model
 		in hourly resolution of a circuit or main before and after an event. 
 		In this case it is ML06 before and after refrigerator installation.
 	
-	compare_datasets.py - loads demand, accumulative demand, and credit data from the 
-		...array.csv and the ...array2.csv files. This files then creates data 
+	compare_datasets.py - loads demand, accumulative demand, and credit data from 
+		the ...array.csv and the ...array2.csv files. This files then creates data 
 		availability maps for two SD card dump records. ...array.csv files 
-		are used for Mali, and ...array2.csv files are used for Uganda. It also creates a
-		histogram of comsumer energy usage for both Uganda and Mali. 
+		are used for Mali, and ...array2.csv files are used for Uganda. It also 
+		creates a histogram of comsumer energy usage for both Uganda and Mali. 
 	
 	data_check.py - read through csv file and look for occurances of accumulative 
 		Whr going down.
@@ -546,6 +556,14 @@ System Optimization Model
 		country, site, circuit, and date. The next two columns contain the circuit 
 		operational data and are wh and credit.
 	
+	merge_records.py - takes data from allmeterdemandarray.csv and 
+		allmeterdemandarray2.csv and merges them into a single csv called 
+		allmeterdemandarray_merged.csv. Also takes data from allmetercreditarray.csv 
+		and allmetercreditarray2.csv merges them into a single file called 
+		allmetercreditarray_merged.csv. When/if conflicting timestamps occur from data
+		dump 1 and data dump 2, the second data dump (from November 2012) is 
+		always given precident.
+
 	meter_stats_4.py - this file was created by Rejesh. This file sorts through 
 		raw SD card data and will output a time series for a particular circuit
 		for any particular time frame. It is also capable of plotting the results
