@@ -38,10 +38,14 @@ r, c = np.shape(demdata)
 # Separate ML (dataset 1)
 
 ml = []
+ug1 = []
 for ix in range(0,c):
-    n = demdata.columns[ix][0]
-    if n == 'm':
-        ml.append(demdata.columns[ix])
+	n = demdata.columns[ix][0]
+	if n == 'm':
+		ml.append(demdata.columns[ix])
+	else:
+		ug1.append(demdata.columns[ix])
+	
 
 # <codecell>
 
@@ -74,23 +78,43 @@ circlist2 = demdata2.columns.tolist()
 datelist2_hr = demdata2.index.tolist()
 r2, c2 = np.shape(demdata2)
 
-ug = []
+ug2 = []
 for ix in range(0,c2):
     n = demdata2.columns[ix][0]
     if n == 'u':
-        ug.append(demdata2.columns[ix])
+        ug2.append(demdata2.columns[ix])
 
-ug_mains = []
-ug_circuits = []
-for ix, row in enumerate(ug):
+ug2_mains = []
+ug2_circuits = []
+for ix, row in enumerate(ug2):
     n = int(row.split('_')[1])
     if n == 0:
-        ug_mains.append(ug[ix])
+        ug2_mains.append(ug2[ix])
     else:
-        ug_circuits.append(ug[ix])
+        ug2_circuits.append(ug2[ix])
 
 
 # <headingcell level=2>
+
+# Import dataset 3 (1 and 2 merged)
+
+# <codecell>
+
+
+demdatam = read_csv('allmetersdemandarray_merged.csv', delimiter=',',index_col =0,parse_dates = True)
+# If the hourly demand is greater than 1000 Wh replace with nan
+demdatam[demdatam >= 1000] = np.nan
+creddatam = read_csv('allmeterscreditarray_merged.csv', delimiter=',',index_col =0,parse_dates = True)
+circlistm = demdatam.columns.tolist()
+datelistm_hr = demdatam.index.tolist()
+rm, cm = np.shape(demdatam)
+
+ugm = []
+for ix in range(0,cm):
+    n = demdatam.columns[ix][0]
+    if n == 'u':
+        ugm.append(demdatam.columns[ix])
+
 
 # Data avaiability plot (Set 1)
 
@@ -98,14 +122,19 @@ for ix, row in enumerate(ug):
 
 fig = plt.figure()
 densityplot = fig.add_subplot(1,1,1)
-densityplot.spy(demdata[ml].ix[demdata[ml].index[0]:demdata[ml].index[-1]], aspect = 'auto')
-densityplot.set_xticks(range(0,np.shape(demdata[ml].columns)[0]))
-densityplot.set_xticklabels(ml)
-densityplot.set_yticks(range(0,r,750))
-densityplot.set_yticklabels(datelist_hr[0:r:750])
+#densityplot.spy(demdata[ml].ix[demdata[ml].index[0]:demdata[ml].index[-1]], aspect = 'auto')
+densityplot.spy(demdata[ug1].ix[demdata[ug1].index[8760]:demdata[ug1].index[-1]], aspect = 'auto')
+#densityplot.set_xticks(range(0,np.shape(demdata[ml].columns)[0]))
+densityplot.set_xticks(range(0,np.shape(demdata[ug1].columns)[0]))
+#densityplot.set_xticklabels(ml)
+densityplot.set_xticklabels(ug1)
+#densityplot.set_yticks(range(0,r,750))
+densityplot.set_yticks(range(0,r2,750))
+
+densityplot.set_yticklabels(datelist2_hr[0:r2:750])
 densityplot.set_xlabel('Mains and Circuits')
 densityplot.set_ylabel('Date and Time')
-densityplot.set_title('Data Availablity at Hourly Resolution (Mali)')
+densityplot.set_title('Data Availablity at Hourly Resolution (Set 1)')
 plt.show()
 
 # <headingcell level=2>
@@ -117,17 +146,40 @@ plt.show()
 fig = plt.figure()
 densityplot = fig.add_subplot(1,1,1)
 densityplot.spy(demdata2, aspect = 'auto')
-densityplot.set_xticks(range(0,np.shape(ug)[0]))
+densityplot.set_xticks(range(0,np.shape(ug2)[0]))
 densityplot.set_xticklabels(demdata2.columns)
 densityplot.set_yticks(range(0,r2,168))
 densityplot.set_yticklabels(datelist2_hr[0:r:168])
 densityplot.set_xlabel('Mains and Circuits')
 densityplot.set_ylabel('Date and Time')
-densityplot.set_title('Data Availablity at Hourly Resolution')
+densityplot.set_title('Data Availablity at Hourly Resolution (Set 2)')
 plt.show()
 
 # <codecell>
 
+# <headingcell level=2>
+
+# Data avaiability plot Uganda Merged (Set 3)
+
+# <codecell>
+
+
+
+fig = plt.figure()
+densityplot = fig.add_subplot(1,1,1)
+densityplot.spy(demdatam, aspect = 'auto')
+densityplot.set_xticks(range(0,np.shape(ugm)[0]))
+densityplot.set_xticklabels(demdatam.columns)
+densityplot.set_yticks(range(0,rm,168))
+densityplot.set_yticklabels(datelistm_hr[0:r:168])
+densityplot.set_xlabel('Mains and Circuits')
+densityplot.set_ylabel('Date and Time')
+densityplot.set_title('Data Availablity at Hourly Resolution (Merged)')
+plt.show()
+
+# <codecell>
+
+"""
 # Historgram of Mean Daily Energy Usage subplot circuits
 
 demdata_day_ml = demdata[ml].resample('D', how='sum')
@@ -151,6 +203,6 @@ cdemhisto.set_xlabel('Average Daily Energy Consumption (Wh)')
 cdemhisto.set_ylabel('Number of Consumer Circuits')
 cdemhisto.set_title('Histogram of Consumers by Mean Daily Energy Consumption (Uganda)')
 plt.show()
-
+"""
 
 
