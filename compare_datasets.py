@@ -10,7 +10,7 @@
 from pandas import *
 import numpy as np
 import re
-import matplotlib
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import dateutil.parser as dp
 
@@ -164,6 +164,7 @@ mainsdfm_month = mainsdfm_day.resample('M', how='mean')
 circuitsdfm_month= circuitsdfm_day.resample('M', how='mean')
 datelistm_month = demdatam_day.index.tolist()
 
+"""
 # <headingcell level=2>
 
 # Data avaiability plot (Set 1)
@@ -173,16 +174,16 @@ datelistm_month = demdatam_day.index.tolist()
 
 fig = plt.figure()
 densityplot = fig.add_subplot(1,1,1)
-#densityplot.spy(demdata[ml].ix[demdata[ml].index[0]:demdata[ml].index[-1]], aspect = 'auto')
-densityplot.spy(demdata[ug1].ix[demdata[ug1].index[8760]:demdata[ug1].index[-1]], aspect = 'auto')
-#densityplot.set_xticks(range(0,np.shape(demdata[ml].columns)[0]))
-densityplot.set_xticks(range(0,np.shape(demdata[ug1].columns)[0]))
-#densityplot.set_xticklabels(ml)
-densityplot.set_xticklabels(ug1)
-#densityplot.set_yticks(range(0,r,750))
-densityplot.set_yticks(range(0,r2,24))
-
-densityplot.set_yticklabels(datelist2_hr[0:r2:24])
+densityplot.spy(demdata[ml].ix[demdata[ml].index[0]:demdata[ml].index[-1]], aspect = 'auto')
+#densityplot.spy(demdata[ug1].ix[demdata[ug1].index[8760]:demdata[ug1].index[-1]], aspect = 'auto')
+densityplot.set_xticks(range(0,np.shape(demdata[ml].columns)[0]))
+#densityplot.set_xticks(range(0,np.shape(demdata[ug1].columns)[0]))
+densityplot.set_xticklabels(ml)
+#densityplot.set_xticklabels(ug1)
+densityplot.set_yticks(range(0,r,750))
+#densityplot.set_yticks(range(0,r2,24))
+densityplot.set_yticklabels(datelist_hr[0:r:750])
+#densityplot.set_yticklabels(datelist2_hr[0:r2:24])
 densityplot.set_xlabel('Mains and Circuits')
 densityplot.set_ylabel('Date and Time')
 densityplot.set_title('Data Availablity at Hourly Resolution (Set 1)')
@@ -224,6 +225,7 @@ densityplot.set_ylabel('Date and Time')
 densityplot.set_title('Data Availablity at Hourly Resolution (Merged)')
 plt.show()
 
+"""
 # <headingcell level=2>
 
 # Monthly Data Availability Maps
@@ -239,23 +241,36 @@ for ix, name in enumerate(circuitsdf_month.index):
 fig = plt.figure()
 densityplot = fig.add_subplot(1,1,1)
 densityplot.grid(True)
-densityplot.spy(mainsdf_month, aspect = 'auto')
-densityplot.set_xticks(range(0,np.shape(mainsdf_month.columns)[0]))
-densityplot.set_xticklabels(mainsdf_month.columns)
+#densityplot.spy(mainsdf_month, aspect = 'auto')
+pic = densityplot.imshow(mainsdf_month[ml_mains[1:]], aspect = 'auto', cmap= mpl.cm.jet)
+densityplot.set_xticks(range(0,np.shape(ml_mains[1:])[0]))
+densityplot.set_xticklabels(ml_mains[1:])
 densityplot.set_yticks(range(0,np.shape(mainsdf_month.index)[0]))
 densityplot.set_yticklabels(mdateaxis)
+densityplot.set_title('Average Daily Energy Consumption over Time')
+densityplot.set_xlabel('Mali Location')
+densityplot.set_ylabel('Month')
+pic.set_interpolation('nearest')
+fig.colorbar(pic).set_label('Average Wh Consumed Daily')
 densityplot.plot()
 
 # Mali Circuits (Part 1)
 fig = plt.figure()
 densityplot = fig.add_subplot(1,1,1)
 densityplot.grid(True)
-densityplot.spy(circuitsdf_month[ml_circuits[12:92]], aspect = 'auto')
+#densityplot.spy(circuitsdf_month[ml_circuits[12:92]], aspect = 'auto')
+pic = densityplot.imshow(circuitsdf_month[ml_circuits[12:92]], aspect = 'auto')
+pic.set_clim(0.0,150)
 densityplot.set_xticks(range(0,np.shape(ml_circuits[12:92])[0]))
 densityplot.set_xticklabels(ml_circuits[12:92],rotation = 'vertical')
 densityplot.tick_params(axis='x', which='major', labelsize=12)
 densityplot.set_yticks(range(0,np.shape(circuitsdf_month.index)[0]))
 densityplot.set_yticklabels(mdateaxis)
+densityplot.set_title('Average Daily Energy Consumption over Time',fontsize =18)
+densityplot.set_xlabel('Mali Circuit',fontsize =18)
+densityplot.set_ylabel('Month',fontsize =18)
+pic.set_interpolation('nearest')
+fig.colorbar(pic).set_label('Average Wh Consumed Daily',fontsize =18)
 densityplot.plot()
 
 
@@ -263,14 +278,20 @@ densityplot.plot()
 fig = plt.figure()
 densityplot = fig.add_subplot(1,1,1)
 densityplot.grid(True)
-densityplot.spy(circuitsdf_month[ml_circuits[92:]], aspect = 'auto')
+#densityplot.spy(circuitsdf_month[ml_circuits[92:]], aspect = 'auto')
+pic = densityplot.imshow(circuitsdf_month[ml_circuits[92:]], aspect = 'auto')
+pic.set_clim(0.0,150)
 densityplot.set_xticks(range(0,np.shape(ml_circuits[92:])[0]))
 densityplot.set_xticklabels(ml_circuits[92:],rotation = 'vertical')
 densityplot.tick_params(axis='x', which='major', labelsize=12)
 densityplot.set_yticks(range(0,np.shape(circuitsdf_month.index)[0]))
 densityplot.set_yticklabels(mdateaxis)
+densityplot.set_title('Average Daily Energy Consumption over Time', fontsize =18)
+densityplot.set_xlabel('Mali Circuit',fontsize =18)
+densityplot.set_ylabel('Month',fontsize =18)
+pic.set_interpolation('nearest')
+fig.colorbar(pic).set_label('Average Wh Consumed Daily',fontsize =18)
 densityplot.plot()
-
 
 
 
@@ -284,37 +305,94 @@ for ix, name in enumerate(circuitsdfm_month.index):
 fig = plt.figure()
 densityplot = fig.add_subplot(1,1,1)
 densityplot.grid(True)
-densityplot.spy(mainsdfm_month, aspect = 'auto')
+#densityplot.spy(mainsdfm_month, aspect = 'auto')
+pic = densityplot.imshow(mainsdfm_month, aspect = 'auto')
 densityplot.set_xticks(range(0,np.shape(mainsdfm_month.columns)[0]))
 densityplot.set_xticklabels(mainsdfm_month.columns)
 densityplot.set_yticks(range(0,np.shape(mainsdfm_month.index)[0]))
 densityplot.set_yticklabels(udateaxis)
+densityplot.set_title('Average Daily Energy Consumption over Time', fontsize =18)
+densityplot.set_xlabel('Uganda Mains',fontsize =18)
+densityplot.set_ylabel('Month',fontsize =18)
+pic.set_interpolation('nearest')
+fig.colorbar(pic).set_label('Average Wh Consumed Daily',fontsize =18)
 densityplot.plot()
 
 # Uganda Circuits
 fig = plt.figure()
 densityplot = fig.add_subplot(1,1,1)
 densityplot.grid(True)
-densityplot.spy(circuitsdfm_month, aspect = 'auto')
+#densityplot.spy(circuitsdfm_month, aspect = 'auto')
+pic = densityplot.imshow(circuitsdfm_month, aspect = 'auto')
 densityplot.set_xticks(range(0,np.shape(circuitsdfm_month.columns)[0]))
 densityplot.set_xticklabels(circuitsdfm_month.columns,rotation='vertical')
 densityplot.set_yticks(range(0,np.shape(circuitsdfm_month.index)[0]))
 densityplot.set_yticklabels(udateaxis)
+densityplot.set_title('Average Daily Energy Consumption over Time', fontsize =18)
+densityplot.set_xlabel('Uganda Circuits',fontsize =18)
+densityplot.set_ylabel('Month',fontsize =18)
+pic.set_interpolation('nearest')
+fig.colorbar(pic).set_label('Average Wh Consumed Daily',fontsize =18)
+densityplot.plot()
+
+# Uganda Circuits Lowest Third
+fig = plt.figure()
+densityplot = fig.add_subplot(1,1,1)
+densityplot.grid(True)
+#densityplot.spy(circuitsdfm_month, aspect = 'auto')
+pic = densityplot.imshow(circuitsdfm_month[np.sort(circuitsdfm_day.mean())[0:22].index] , aspect = 'auto')
+densityplot.set_xticks(range(0,np.shape(circuitsdfm_month[np.sort(circuitsdfm_day.mean())[0:22].index])[0]))
+densityplot.set_xticklabels(np.sort(circuitsdfm_day.mean())[0:22].index,rotation='vertical')
+densityplot.set_yticks(range(0,np.shape(circuitsdfm_month.index)[0]))
+densityplot.set_yticklabels(udateaxis)
+densityplot.set_title('Average Daily Energy Consumption over Time (Lowest Third)', fontsize =18)
+densityplot.set_xlabel('Uganda Circuits',fontsize =18)
+densityplot.set_ylabel('Month',fontsize =18)
+pic.set_interpolation('nearest')
+fig.colorbar(pic).set_label('Average Wh Consumed Daily',fontsize =18)
+densityplot.plot()
+
+# Uganda Circuits Upper Third
+fig = plt.figure()
+densityplot = fig.add_subplot(1,1,1)
+densityplot.grid(True)
+#densityplot.spy(circuitsdfm_month, aspect = 'auto')
+pic = densityplot.imshow(circuitsdfm_month[np.sort(circuitsdfm_day.mean())[46:67].index] , aspect = 'auto')
+densityplot.set_xticks(range(0,np.shape(circuitsdfm_month[np.sort(circuitsdfm_day.mean())[46:67].index])[0]))
+densityplot.set_xticklabels(np.sort(circuitsdfm_day.mean())[46:67].index,rotation='vertical')
+densityplot.set_yticks(range(0,np.shape(circuitsdfm_month.index)[0]))
+densityplot.set_yticklabels(udateaxis)
+densityplot.set_title('Average Daily Energy Consumption over Time (Upper Third)', fontsize =18)
+densityplot.set_xlabel('Uganda Circuits',fontsize =18)
+densityplot.set_ylabel('Month',fontsize =18)
+pic.set_interpolation('nearest')
+fig.colorbar(pic).set_label('Average Wh Consumed Daily',fontsize =18)
+densityplot.plot()
+
+# Uganda Circuits Middle Third
+fig = plt.figure()
+densityplot = fig.add_subplot(1,1,1)
+densityplot.grid(True)
+#densityplot.spy(circuitsdfm_month, aspect = 'auto')
+pic = densityplot.imshow(circuitsdfm_month[np.sort(circuitsdfm_day.mean())[23:45].index] , aspect = 'auto')
+densityplot.set_xticks(range(0,np.shape(circuitsdfm_month[np.sort(circuitsdfm_day.mean())[23:45].index])[0]))
+densityplot.set_xticklabels(np.sort(circuitsdfm_day.mean())[23:45].index,rotation='vertical')
+densityplot.set_yticks(range(0,np.shape(circuitsdfm_month.index)[0]))
+densityplot.set_yticklabels(udateaxis)
+densityplot.set_title('Average Daily Energy Consumption over Time (Middle Third)', fontsize =18)
+densityplot.set_xlabel('Uganda Circuits',fontsize =18)
+densityplot.set_ylabel('Month',fontsize =18)
+pic.set_interpolation('nearest')
+fig.colorbar(pic).set_label('Average Wh Consumed Daily',fontsize =18)
 densityplot.plot()
 
 
-# <codecell>
 
+# <headingcell level=2>
 
-# <codecell>
-
-
-# <codecell>
-
+#Show all figures
 
 # <codecell>
 
-
-# <codecell>
-
+plt.show()
 
