@@ -32,10 +32,7 @@ creddata  = read_csv('allmeterscreditarray.csv', delimiter=',',index_col =0,pars
 circlist = demdata.columns.tolist()
 datelist_hr = demdata.index.tolist()
 r, c = np.shape(demdata)
-
-# <headingcell level=2>
-
-# Separate ML (dataset 1)
+#Separate ML (dataset 1)
 
 ml = []
 ug1 = []
@@ -46,9 +43,6 @@ for ix in range(0,c):
 	else:
 		ug1.append(demdata.columns[ix])
 	
-
-# <codecell>
-
 #  Create list of Mains names and Circuit Names
 
 ml_mains = []
@@ -60,8 +54,22 @@ for ix, row in enumerate(ml):
     else:
         ml_circuits.append(ml[ix])
 
+# <codecell>
 
-        
+# Convert to Daily Resolution 
+
+# Sum across hours to make daily resolution 
+demdata_day = demdata.resample('D', how='sum')
+mainsdf_day = demdata[ml_mains].resample('D', how='sum')
+circuitsdf_day = demdata[ml_circuits].resample('D', how='sum')
+datelist_day = demdata_day.index.tolist()
+# Convert to Monthly Resolution
+
+# Use Daily Average Energy 
+demdata_month = demdata_day.resample('M', how='mean')
+mainsdf_month = mainsdf_day.resample('M', how='mean')
+circuitsdf_month= circuitsdf_day.resample('M', how='mean')
+datelist_month = demdata_day.index.tolist()
 
 # <headingcell level=2>
 
@@ -93,13 +101,28 @@ for ix, row in enumerate(ug2):
     else:
         ug2_circuits.append(ug2[ix])
 
+# <codecell>
+
+# Convert to Daily Resolution 
+
+# Sum across hours to make daily resolution 
+demdata2_day = demdata2.resample('D', how='sum')
+mainsdf2_day = demdata2[ug2_mains].resample('D', how='sum')
+circuitsdf2_day = demdata2[ug2_circuits].resample('D', how='sum')
+datelist2_day = demdata2_day.index.tolist()
+# Convert to Monthly Resolution
+
+# Use Daily Average Energy 
+demdata2_month = demdata2_day.resample('M', how='mean')
+mainsdf2_month = mainsdf2_day.resample('M', how='mean')
+circuitsdf2_month= circuitsdf2_day.resample('M', how='mean')
+datelist2_month = demdata2_day.index.tolist()
 
 # <headingcell level=2>
 
 # Import dataset 3 (1 and 2 merged)
 
 # <codecell>
-
 
 demdatam = read_csv('allmetersdemandarray_merged.csv', delimiter=',',index_col =0,parse_dates = True)
 # If the hourly demand is greater than 1000 Wh replace with nan
@@ -115,10 +138,38 @@ for ix in range(0,cm):
     if n == 'u':
         ugm.append(demdatam.columns[ix])
 
+ugm_mains = []
+ugm_circuits = []
+for ix, row in enumerate(ugm):
+    n = int(row.split('_')[1])
+    if n == 0:
+        ugm_mains.append(ugm[ix])
+    else:
+        ugm_circuits.append(ugm[ix])
+
+# <codecell>
+
+# Convert to Daily Resolution 
+
+# Sum across hours to make daily resolution 
+demdatam_day = demdatam.resample('D', how='sum')
+mainsdfm_day = demdatam[ugm_mains].resample('D', how='sum')
+circuitsdfm_day = demdatam[ugm_circuits].resample('D', how='sum')
+datelistm_day = demdatam_day.index.tolist()
+# Convert to Monthly Resolution
+
+# Use Daily Average Energy 
+demdatam_month = demdatam_day.resample('M', how='mean')
+mainsdfm_month = mainsdfm_day.resample('M', how='mean')
+circuitsdfm_month= circuitsdfm_day.resample('M', how='mean')
+datelistm_month = demdatam_day.index.tolist()
+
+# <headingcell level=2>
 
 # Data avaiability plot (Set 1)
 
 # <codecell>
+
 
 fig = plt.figure()
 densityplot = fig.add_subplot(1,1,1)
@@ -155,15 +206,11 @@ densityplot.set_ylabel('Date and Time')
 densityplot.set_title('Data Availablity at Hourly Resolution (Set 2)')
 plt.show()
 
-# <codecell>
-
 # <headingcell level=2>
 
 # Data avaiability plot Uganda Merged (Set 3)
 
 # <codecell>
-
-
 
 fig = plt.figure()
 densityplot = fig.add_subplot(1,1,1)
@@ -177,32 +224,97 @@ densityplot.set_ylabel('Date and Time')
 densityplot.set_title('Data Availablity at Hourly Resolution (Merged)')
 plt.show()
 
+# <headingcell level=2>
+
+# Monthly Data Availability Maps
+
 # <codecell>
 
-"""
-# Historgram of Mean Daily Energy Usage subplot circuits
+# Mali Mains
+mdateaxis = []
+for ix, name in enumerate(circuitsdf_month.index):
+    mdateaxis.append(name.strftime("%m-%Y"))
 
-demdata_day_ml = demdata[ml].resample('D', how='sum')
-demdata_day_ug = demdata2[ug].resample('D', how='sum')
 
-# Mali 
 fig = plt.figure()
-cdemhisto =  fig.add_subplot(1,1,1)
-cdemhisto.hist(demdata_day_ml.mean(),bins = 20, histtype='bar',range = (0,500))
-cdemhisto.set_xlabel('Average Daily Energy Consumption (Wh)')
-cdemhisto.set_ylabel('Number of Consumer Circuits')
-cdemhisto.set_title('Histogram of Consumers by Mean Daily Energy Consumption (Mali)')
-plt.show()
+densityplot = fig.add_subplot(1,1,1)
+densityplot.grid(True)
+densityplot.spy(mainsdf_month, aspect = 'auto')
+densityplot.set_xticks(range(0,np.shape(mainsdf_month.columns)[0]))
+densityplot.set_xticklabels(mainsdf_month.columns)
+densityplot.set_yticks(range(0,np.shape(mainsdf_month.index)[0]))
+densityplot.set_yticklabels(mdateaxis)
+densityplot.plot()
 
-
-# Uganda
+# Mali Circuits (Part 1)
 fig = plt.figure()
-cdemhisto =  fig.add_subplot(1,1,1)
-cdemhisto.hist(demdata_day_ug.mean(),bins = 20, histtype='bar',range = (0,500))
-cdemhisto.set_xlabel('Average Daily Energy Consumption (Wh)')
-cdemhisto.set_ylabel('Number of Consumer Circuits')
-cdemhisto.set_title('Histogram of Consumers by Mean Daily Energy Consumption (Uganda)')
-plt.show()
-"""
+densityplot = fig.add_subplot(1,1,1)
+densityplot.grid(True)
+densityplot.spy(circuitsdf_month[ml_circuits[12:92]], aspect = 'auto')
+densityplot.set_xticks(range(0,np.shape(ml_circuits[12:92])[0]))
+densityplot.set_xticklabels(ml_circuits[12:92],rotation = 'vertical')
+densityplot.tick_params(axis='x', which='major', labelsize=12)
+densityplot.set_yticks(range(0,np.shape(circuitsdf_month.index)[0]))
+densityplot.set_yticklabels(mdateaxis)
+densityplot.plot()
+
+
+# Mali Circuits (Part 2)
+fig = plt.figure()
+densityplot = fig.add_subplot(1,1,1)
+densityplot.grid(True)
+densityplot.spy(circuitsdf_month[ml_circuits[92:]], aspect = 'auto')
+densityplot.set_xticks(range(0,np.shape(ml_circuits[92:])[0]))
+densityplot.set_xticklabels(ml_circuits[92:],rotation = 'vertical')
+densityplot.tick_params(axis='x', which='major', labelsize=12)
+densityplot.set_yticks(range(0,np.shape(circuitsdf_month.index)[0]))
+densityplot.set_yticklabels(mdateaxis)
+densityplot.plot()
+
+
+
+
+# Uganda Mains
+
+udateaxis = []
+for ix, name in enumerate(circuitsdfm_month.index):
+    udateaxis.append(name.strftime("%m-%Y"))
+
+
+fig = plt.figure()
+densityplot = fig.add_subplot(1,1,1)
+densityplot.grid(True)
+densityplot.spy(mainsdfm_month, aspect = 'auto')
+densityplot.set_xticks(range(0,np.shape(mainsdfm_month.columns)[0]))
+densityplot.set_xticklabels(mainsdfm_month.columns)
+densityplot.set_yticks(range(0,np.shape(mainsdfm_month.index)[0]))
+densityplot.set_yticklabels(udateaxis)
+densityplot.plot()
+
+# Uganda Circuits
+fig = plt.figure()
+densityplot = fig.add_subplot(1,1,1)
+densityplot.grid(True)
+densityplot.spy(circuitsdfm_month, aspect = 'auto')
+densityplot.set_xticks(range(0,np.shape(circuitsdfm_month.columns)[0]))
+densityplot.set_xticklabels(circuitsdfm_month.columns,rotation='vertical')
+densityplot.set_yticks(range(0,np.shape(circuitsdfm_month.index)[0]))
+densityplot.set_yticklabels(udateaxis)
+densityplot.plot()
+
+
+# <codecell>
+
+
+# <codecell>
+
+
+# <codecell>
+
+
+# <codecell>
+
+
+# <codecell>
 
 
