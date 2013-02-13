@@ -7,12 +7,14 @@
 
 # <codecell>
 
-from pandas import *
+import pandas as pd
 import numpy as np
 import re
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import dateutil.parser as dp
+import string
+
 
 # <codecell>
 
@@ -24,11 +26,11 @@ import dateutil.parser as dp
 
 # <codecell>
 
-demdata = read_csv('allmetersdemandarray.csv', delimiter=',',index_col =0,parse_dates = True)
+demdata = pd.read_csv('allmetersdemandarray.csv', delimiter=',',index_col =0,parse_dates = True)
 # If the hourly demand is greater than 1000 Wh replace with nan
 demdata[demdata >= 1000] = np.nan
-demdatacum = read_csv('allmeterscumdemandarray.csv', delimiter=',',index_col =0,parse_dates = True)
-creddata  = read_csv('allmeterscreditarray.csv', delimiter=',',index_col =0,parse_dates = True)
+demdatacum = pd.read_csv('allmeterscumdemandarray.csv', delimiter=',',index_col =0,parse_dates = True)
+creddata  = pd.read_csv('allmeterscreditarray.csv', delimiter=',',index_col =0,parse_dates = True)
 circlist = demdata.columns.tolist()
 datelist_hr = demdata.index.tolist()
 r, c = np.shape(demdata)
@@ -77,11 +79,11 @@ datelist_month = demdata_day.index.tolist()
 
 # <codecell>
 
-demdata2 = read_csv('allmetersdemandarray2.csv', delimiter=',',index_col =0,parse_dates = True)
+demdata2 = pd.read_csv('allmetersdemandarray2.csv', delimiter=',',index_col =0,parse_dates = True)
 # If the hourly demand is greater than 1000 Wh replace with nan
 demdata2[demdata2 >= 1000] = np.nan
-demdatacum2 = read_csv('allmeterscumdemandarray2.csv', delimiter=',',index_col =0,parse_dates = True)
-creddata2  = read_csv('allmeterscreditarray2.csv', delimiter=',',index_col =0,parse_dates = True)
+demdatacum2 = pd.read_csv('allmeterscumdemandarray2.csv', delimiter=',',index_col =0,parse_dates = True)
+creddata2  = pd.read_csv('allmeterscreditarray2.csv', delimiter=',',index_col =0,parse_dates = True)
 circlist2 = demdata2.columns.tolist()
 datelist2_hr = demdata2.index.tolist()
 r2, c2 = np.shape(demdata2)
@@ -124,10 +126,10 @@ datelist2_month = demdata2_day.index.tolist()
 
 # <codecell>
 
-demdatam = read_csv('allmetersdemandarray_merged.csv', delimiter=',',index_col =0,parse_dates = True)
+demdatam = pd.read_csv('allmetersdemandarray_merged.csv', delimiter=',',index_col =0,parse_dates = True)
 # If the hourly demand is greater than 1000 Wh replace with nan
 #demdatam[demdatam >= 1000] = np.nan
-creddatam = read_csv('allmeterscreditarray_merged.csv', delimiter=',',index_col =0,parse_dates = True)
+creddatam = pd.read_csv('allmeterscreditarray_merged.csv', delimiter=',',index_col =0,parse_dates = True)
 circlistm = demdatam.columns.tolist()
 datelistm_hr = demdatam.index.tolist()
 rm, cm = np.shape(demdatam)
@@ -164,7 +166,37 @@ mainsdfm_month = mainsdfm_day.resample('M', how='mean')
 circuitsdfm_month= circuitsdfm_day.resample('M', how='mean')
 datelistm_month = demdatam_day.index.tolist()
 
-"""
+
+# <headingcell level=2>
+
+# Count Circuits
+
+# <codecell>
+
+# Uganda
+ugcount_idx = []
+for ix, m in enumerate(ugm_circuits):
+        ugcount_idx.append(string.split(m,'_')[0])
+
+ugcount_idx = np.sort(list(set(ugcount_idx)))
+ugcount = pd.Series(np.zeros(np.shape(ugcount_idx)[0]),index = ugcount_idx)
+
+for ix,circ in enumerate(ugm_circuits):
+        ugcount[string.split(circ,'_')[0]] += 1
+
+# Mali
+mlcount_idx = []
+for ix, m in enumerate(ml_circuits):
+        mlcount_idx.append(string.split(m,'_')[0])
+
+mlcount_idx = np.sort(list(set(mlcount_idx)))
+mlcount = pd.Series(np.zeros(np.shape(mlcount_idx)[0]),index = mlcount_idx)
+
+for ix,circ in enumerate(ml_circuits):
+        mlcount[string.split(circ,'_')[0]] += 1
+
+
+
 # <headingcell level=2>
 
 # Data avaiability plot (Set 1)
@@ -217,7 +249,7 @@ fig = plt.figure()
 densityplot = fig.add_subplot(1,1,1)
 densityplot.spy(demdatam, aspect = 'auto')
 densityplot.set_xticks(range(0,np.shape(ugm)[0]))
-densityplot.set_xticklabels(demdatam.columns)
+densityplot.set_xticklabels(demdatam.columns,rotation = 'vertical')
 densityplot.set_yticks(range(0,rm,24))
 densityplot.set_yticklabels(datelistm_hr[0:r:24])
 densityplot.set_xlabel('Mains and Circuits')
@@ -266,11 +298,11 @@ densityplot.set_xticklabels(ml_circuits[12:92],rotation = 'vertical')
 densityplot.tick_params(axis='x', which='major', labelsize=12)
 densityplot.set_yticks(range(0,np.shape(circuitsdf_month.index)[0]))
 densityplot.set_yticklabels(mdateaxis)
-densityplot.set_title('Average Daily Energy Consumption over Time',fontsize =18)
-densityplot.set_xlabel('Mali Circuit',fontsize =18)
-densityplot.set_ylabel('Month',fontsize =18)
+densityplot.set_title('Average Daily Energy Consumption over Time',fontsize =22)
+densityplot.set_xlabel('Mali Circuit',fontsize =22)
+densityplot.set_ylabel('Month',fontsize =22)
 pic.set_interpolation('nearest')
-fig.colorbar(pic).set_label('Average Wh Consumed Daily',fontsize =18)
+fig.colorbar(pic).set_label('Average Wh Consumed Daily',fontsize =22)
 densityplot.plot()
 
 
@@ -286,11 +318,11 @@ densityplot.set_xticklabels(ml_circuits[92:],rotation = 'vertical')
 densityplot.tick_params(axis='x', which='major', labelsize=12)
 densityplot.set_yticks(range(0,np.shape(circuitsdf_month.index)[0]))
 densityplot.set_yticklabels(mdateaxis)
-densityplot.set_title('Average Daily Energy Consumption over Time', fontsize =18)
-densityplot.set_xlabel('Mali Circuit',fontsize =18)
-densityplot.set_ylabel('Month',fontsize =18)
+densityplot.set_title('Average Daily Energy Consumption over Time', fontsize =22)
+densityplot.set_xlabel('Mali Circuit',fontsize =22)
+densityplot.set_ylabel('Month',fontsize =22)
 pic.set_interpolation('nearest')
-fig.colorbar(pic).set_label('Average Wh Consumed Daily',fontsize =18)
+fig.colorbar(pic).set_label('Average Wh Consumed Daily',fontsize =22)
 densityplot.plot()
 
 
@@ -386,7 +418,7 @@ pic.set_interpolation('nearest')
 fig.colorbar(pic).set_label('Average Wh Consumed Daily',fontsize =18)
 densityplot.plot()
 
-
+"""
 
 # <headingcell level=2>
 
