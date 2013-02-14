@@ -164,7 +164,7 @@ datelistm_day = demdatam_day.index.tolist()
 demdatam_month = demdatam_day.resample('M', how='mean')
 mainsdfm_month = mainsdfm_day.resample('M', how='mean')
 circuitsdfm_month= circuitsdfm_day.resample('M', how='mean')
-datelistm_month = demdatam_day.index.tolist()
+datelistm_month = demdatam_month.index.tolist()
 
 
 # <headingcell level=2>
@@ -228,7 +228,11 @@ for ix, site in enumerate(site_list):
 
 ugm_cirsumday = ugm_cirsum.resample('D', how='sum')
 ugm_cirsummonth = ugm_cirsumday.resample('M', how='mean')
+udateaxis = []
+for ix, name in enumerate(circuitsdfm_month.index):
+    udateaxis.append(name.strftime("%m-%Y"))
 
+ugm_cirsummonth = ugm_cirsummonth.rename(index = dict(zip(datelistm_month, udateaxis)))
 
 ugm_cirsummonth.plot(kind = 'bar', stacked =True)
 plt.title('Net Daily Average Energy Usage')
@@ -241,9 +245,11 @@ for jx in range(0, np.shape(ugm_cirsummonth2)[1]):
 		if ix!=0 and np.isnan(ugm_cirsummonth2[ix,jx]) == True:
 			ugm_cirsummonth2[ix,jx] = ugm_cirsummonth2[ix-1,jx]
 
-ugm_cirsummonth2 = pd.DataFrame(ugm_cirsummonth2, index = ugm_cirsummonth.index, columns = ugm_cirsummonth.columns)
+
+
+ugm_cirsummonth2 = pd.DataFrame(ugm_cirsummonth2, index = udateaxis, columns = ugm_cirsummonth.columns)
 ugm_cirsummonth2.plot(kind = 'bar', stacked =True)
-plt.title('Net Daily Average Energy Usage')
+plt.title('Net Daily Average Energy Usage (Gaps Filled)')
 plt.ylabel('Cumulative Wh')
 
 """
