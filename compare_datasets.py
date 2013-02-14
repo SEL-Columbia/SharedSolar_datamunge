@@ -195,7 +195,58 @@ mlcount = pd.Series(np.zeros(np.shape(mlcount_idx)[0]),index = mlcount_idx)
 for ix,circ in enumerate(ml_circuits):
         mlcount[string.split(circ,'_')[0]] += 1
 
+# <headingcell level=2>
 
+# Create Dictionary of Circuits in Each Main
+
+# <codecell>
+
+site_dict = {}
+ugm_mains.append('ug05_0')
+site_list = np.sort(ugm_mains)
+
+for ix, site in enumerate(site_list):
+	site_dict[string.split(site,'_')[0]] = []
+
+for ix, circ in enumerate(ugm_circuits):
+	site_dict[string.split(circ,'_')[0]].append(circ)
+
+site_list = np.sort(site_dict.keys())
+
+# <headingcell level=2>
+
+# Create Mains by summing circuits
+
+# <codecell>
+
+ugm_cirsum = pd.DataFrame(index = datelistm_hr)
+
+for ix, site in enumerate(site_list):
+	dftemp = pd.DataFrame(demdatam[site_dict[site]].sum(axis = 1), columns = [site])
+	ugm_cirsum = ugm_cirsum.join(dftemp)
+
+
+ugm_cirsumday = ugm_cirsum.resample('D', how='sum')
+ugm_cirsummonth = ugm_cirsumday.resample('M', how='mean')
+
+
+ugm_cirsummonth.plot(kind = 'bar', stacked =True)
+plt.title('Net Daily Average Energy Usage')
+plt.ylabel('Cumulative Wh')
+
+ugm_cirsummonth2 = np.array(ugm_cirsummonth)
+
+for jx in range(0, np.shape(ugm_cirsummonth2)[1]):
+	for ix in range(0, np.shape(ugm_cirsummonth2)[0]):
+		if ix!=0 and np.isnan(ugm_cirsummonth2[ix,jx]) == True:
+			ugm_cirsummonth2[ix,jx] = ugm_cirsummonth2[ix-1,jx]
+
+ugm_cirsummonth2 = pd.DataFrame(ugm_cirsummonth2, index = ugm_cirsummonth.index, columns = ugm_cirsummonth.columns)
+ugm_cirsummonth2.plot(kind = 'bar', stacked =True)
+plt.title('Net Daily Average Energy Usage')
+plt.ylabel('Cumulative Wh')
+
+"""
 
 # <headingcell level=2>
 
@@ -257,7 +308,7 @@ densityplot.set_ylabel('Date and Time')
 densityplot.set_title('Data Availablity at Hourly Resolution (Merged)')
 plt.show()
 
-"""
+
 # <headingcell level=2>
 
 # Monthly Data Availability Maps
