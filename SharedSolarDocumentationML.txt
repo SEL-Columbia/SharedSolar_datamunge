@@ -48,10 +48,43 @@ Shared Solar Documentation
 		a single time/(main or circuit) combination allmeterdemandarray2.csv
 		is given precident. 
 
+	gw_cred.csv - pandas DataFrame of all consumer credit data available from 
+		the gateway on Februrary 9, 2013. It was created usign 
+		DF_from_gateway.py which calls on Daniel's function from 
+		offline_gateway.py called get_credit_for_circuit_id().
+
+	gw_wh.csv - pandas DataFrame of all consumer wh data available from 
+		the gateway on Februrary 9, 2013. It was created usign 
+		DF_from_gateway.py which calls on Daniel's function from 
+		offline_gateway.py called get_watthours_for_circuit_id().
+		Cumulative wh resets are NOT corrected. 
+
+	gw_wh_cum.csv - Cumulative gateway wh. Resets removed using 
+		remove_gw_wh_resets.py. Removes energy consumption that 
+		occured between gaps in data and the first measurement that
+		occurs after a gap on data because it is not possible to 
+		know exactly where or if resets occured.  
+
+	gw_wh_fix.csv - Wh per hour energy usage as recorded by the gateway
+		as of February 9, 2013. File created by remove_gw_wh_resets.py.
+		All gaps in gw_wh.csv are expressed as nan, and so are the first 
+		measurement after a gap in data. This is because it is unknown 
+		where or if a reset occured. 
+
 	master_hourly_data.csv - The csv files used by basicstats_master_hourly_data.py 
 		The first four columns contain the hierarchial indexing. These indices 
 		are country, site, circuit, and date. The next two columns are wh and credit.
 		The file was created by make_single_csv.py.
+
+	SD_cred_merged.csv - allmeterscreditarray_merged.csv combined with Mali credit 
+		from allmeterscreditarray.csv. Credit data at hourly resolution for all 
+		circuits at all hours. The index range is from Jan 1, 2010 to 
+		Dec 31, 2014. 
+
+	SD_wh_merged.csv -  allmetersdemandarray_merged.csv combined with Mali credit 
+		from allmeterdemandarray.csv. Demand data at hourly resolution for all 
+		circuits at all hours. The index range is from Jan 1, 2010 to 
+		Dec 31, 2014. 
 
 figures 
 
@@ -533,6 +566,22 @@ System Optimization Model
 	data_check.py - read through csv file and look for occurances of accumulative 
 		Whr going down.
 	
+	DF_from_gateway.py - uses functions from offline_gateway.py called
+		get_watthours_for_circuit_id() and get_credit_for_circuit_id() 
+		to make pandas DataFrames of wh, and credit histories of all 
+		Shared Solar circuits. The output of this script are gw_wh.csv
+		and gw_cred.csv.
+	
+	gw_data_stats.py - series of functions to describe gateway data and compare
+		it to SD card data. 
+		
+		Current functions include:
+
+		datamap() - Spy plot of gw data. 
+
+		data_map_comp() - Spy plot of gw data in one color. Spy plot of SD
+			card data in another color. A third color where they overlap. 
+	
 	hourly2mat.py - Read all hourly csv files and convert them into two
 		matlab matrices. One matlab matrix for hourly accumulative Whr and 
 		another for the credit at the beginning of each hour. Each row represents
@@ -571,6 +620,8 @@ System Optimization Model
 		This includes but is not limited to Watts, "Watt Hours SC20" 
 		(accumulated watt hours), "Adjusted Wh" ( accumulated watt hours 
 		without resets), and the consumer credit.
+
+	remove_gw_wh_resets.py - 
 		
 	submin2hourly.py - Takes in the list of flat csv files produced by writeToCSV.py
 		and converts them into hourly resolution. The output is then a second set of 
