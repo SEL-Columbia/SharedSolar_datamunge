@@ -34,22 +34,23 @@ for jx in range(0,c):
 		if cknan1 == 0 and cknan2 == 0:
 			if wh_ary[ix+1,jx] >= wh_ary[ix,jx]:
 				wh_ary_cum[ix+1,jx] = wh_ary_cum[ix,jx] + wh_ary[ix+1,jx] - wh_ary[ix,jx]
-				wh[ix+1,jx] = wh_ary_cum[ix+1,jx] - wh_ary_cum[ix,jx] 
+				wh[ix,jx] = wh_ary_cum[ix+1,jx] - wh_ary_cum[ix,jx] 
 				lastreal = wh_ary[ix+1,jx]
 			else:
 				wh_ary_cum[ix+1,jx] = wh_ary_cum[ix,jx]# + wh_ary[ix+1,jx]
 				nukelist.append([ix+1,jx])						
-				wh[ix+1,jx] = np.nan#wh_ary_cum[ix+1,jx] - wh_ary_cum[ix,jx]
+				wh[ix,jx] = np.nan#wh_ary_cum[ix+1,jx] - wh_ary_cum[ix,jx]
 				
 			lastreal = wh_ary[ix+1,jx]
 	
 		if cknan2 == 1:
 			wh_ary_cum[ix+1,jx] = wh_ary_cum[ix,jx]
-			wh[ix+1,jx] = np.nan
+			nukelist.append([ix+1,jx])	
+			wh[ix,jx] = np.nan
 
 		if cknan1 == 1 and cknan2 == 0:
 			wh_ary_cum[ix+1,jx] = wh_ary_cum[ix,jx]# + wh_ary[ix+1,jx] -lastreal#jumps will occur if reset is missed
-			wh[ix+1,jx] = np.nan
+			wh[ix,jx] = np.nan
 			nukelist.append([ix+1,jx])				
 			lastreal = wh_ary[ix+1,jx]
 

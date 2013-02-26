@@ -66,11 +66,11 @@ for jdx, r in enumerate(range(181,185)):#n[-1])):
     		    credithrly = float(row[3]) #write credit for the beginning of the first
         
 		if idx != 0 and datetime.datetime(oldyear,oldmonth,oldday,oldhour) != datetime.datetime(year,month,day,hour):
-                    #Append hourly text file 
-		    datehrly = datetime.datetime(oldyear,oldmonth,oldday,oldhour) #form date stamp
-                    fhrwriter.writerow([datehrly,Ercd_old,credithrly])
-                    print np.array([datehrly,Ercd_old,credithrly])
-		credithrly = float(row[3]) #write credit for the beginning of the next hour
+				#Append hourly text file 
+				datehrly = datetime.datetime(oldyear,oldmonth,oldday,oldhour) #form date stamp
+				fhrwriter.writerow([datehrly,Ercd_old,credithrly])
+				print np.array([datehrly,Ercd_old,credithrly])
+				credithrly = float(row[3]) #write credit for the beginning of the next hour
 		Ercd_old = Ercd 		
 		date1 = date2
 		oldhour = hour
