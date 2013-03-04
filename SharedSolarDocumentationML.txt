@@ -79,12 +79,21 @@ Shared Solar Documentation
 	SD_cred_merged.csv - allmeterscreditarray_merged.csv combined with Mali credit 
 		from allmeterscreditarray.csv. Credit data at hourly resolution for all 
 		circuits at all hours. The index range is from Jan 1, 2010 to 
-		Dec 31, 2014. 
+		Dec 31, 2014. 	
 
 	SD_wh_merged.csv -  allmetersdemandarray_merged.csv combined with Mali credit 
 		from allmeterdemandarray.csv. Demand data at hourly resolution for all 
 		circuits at all hours. The index range is from Jan 1, 2010 to 
 		Dec 31, 2014. 
+
+	SDgw_cred.csv = combined hourly SD card and gateway credit data.
+		Contains data for all Mali and Uganda circuits.
+		Created by SD_gw_merg.py.
+
+	SDgw_wh.csv = combined hourly SD card and gateway demand data.
+		Contains data for all Mali and Uganda circuits.
+		Created by SD_gw_merg.py.
+
 
 figures 
 
@@ -199,7 +208,6 @@ figures
 		figure. The line plot is made by calling on the function makeAveDay.m.
 		This file is also saved as a pdf file with the same name. 
 		
-
 
 .m  files (Scripts and Functions)
 
@@ -580,7 +588,20 @@ System Optimization Model
 		datamap() - Spy plot of gw data. 
 
 		data_map_comp() - Spy plot of gw data in one color. Spy plot of SD
-			card data in another color. A third color where they overlap. 
+			card data in another color. A third color where they overlap.
+
+		make_m_from_h(hour_data) - return month_data. Reduces a pandas 
+			dataframe from hourly to monthly resolution. 
+			Finds the average daily energy consumption for each month.  
+		
+		make_month_bplot(month_data) - Takes in an hourly times series
+			for a particular mains or circuit and makes and produces 
+			a bar plot of average daily energy consumption by month.
+
+		open_SSdata() - Open gw_wh, gw_cred, SD_wh, SD_cred: in that order
+			from 'gw_wh_fix.csv','gw_cred.csv', 'SD_wh_merged.csv', and 
+			'SD_cred_merged.csv'.
+		
 	
 	hourly2mat.py - Read all hourly csv files and convert them into two
 		matlab matrices. One matlab matrix for hourly accumulative Whr and 
@@ -621,7 +642,22 @@ System Optimization Model
 		(accumulated watt hours), "Adjusted Wh" ( accumulated watt hours 
 		without resets), and the consumer credit.
 
-	remove_gw_wh_resets.py - 
+	remove_gw_wh_resets.py - cumulative and wh/hr gateway demand data.
+		Imports 'gw_wh.csv'
+		Outputs  'gw_wh_cum.csv' and 'gw_wh_fix.csv'
+		Converts dataframes to numpy arrays. Any time wh_sc20 
+		goes down, or there is a gap in the data, the first 
+		point after is skipped. The difference from this point to
+		the next is used to compute the second point after data
+		abnormalities. 
+
+	SD_gw_merge.py - Imports  
+		allmetersdemandarray_merged.csv - SD Uganda after 11/2012 dump
+		allmeterscreditarray_merged.csv - SD Uganda after 11/2012 dump
+		allmetersdemandarray.csv - SD Mali 
+		allmeterscreditarray.csv - SD Mali
+		gw_wh_fix.csv - Gateway as of Feb 2013, all sites resets removed (Wh/hr)
+		gw_cred.csv - Gateway as of Feb 2013
 		
 	submin2hourly.py - Takes in the list of flat csv files produced by writeToCSV.py
 		and converts them into hourly resolution. The output is then a second set of 
