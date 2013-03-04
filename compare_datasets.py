@@ -252,7 +252,7 @@ ugm_cirsummonth2.plot(kind = 'bar', stacked =True)
 plt.title('Net Daily Average Energy Usage (Gaps Filled)')
 plt.ylabel('Cumulative Wh')
 
-"""
+
 
 # <headingcell level=2>
 
@@ -314,7 +314,7 @@ densityplot.set_ylabel('Date and Time')
 densityplot.set_title('Data Availablity at Hourly Resolution (Merged)')
 plt.show()
 
-
+"""
 # <headingcell level=2>
 
 # Monthly Data Availability Maps
