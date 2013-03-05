@@ -50,14 +50,14 @@ def data_map_comp(wh,demdata,color1,color2):
 	fig = plt.figure()
 	densityplot = fig.add_subplot(1,1,1)
 	densityplot.spy(demdata, aspect = 'auto',cmap = cmap2)		
-	densityplot.spy(wh, aspect = 'auto', cmap = cmap1, alpha = 0.5)
+	densityplot.spy(wh, aspect = 'auto', cmap = cmap1, alpha = 0.6)
 	densityplot.set_xticks(range(0,np.shape(wh)[1]))	
 	densityplot.set_xticklabels(wh.columns)
 	densityplot.set_yticks(range(0,np.shape(wh)[0],750))
 	densityplot.set_yticklabels(wh.index[0:np.shape(wh)[0]:750])
 	densityplot.set_xlabel('Mains and Circuits')
 	densityplot.set_ylabel('Date and Time')
-	densityplot.set_title('GW Data map')
+	densityplot.set_title('Data Map (GW = Red, SD = Green, Both = Brown)')
 	plt.show()
 
 def make_m_from_h(hour_data):
@@ -79,4 +79,32 @@ def make_month_bplot(month_data):
 	month_plot.set_ylabel('Average Daily Energy Usage (Wh/Day)',fontsize =18)
 	month_plot.bar(range(0,48), month_data, align = 'center')
 	return month_plot, month_names
+
+def data_aval_perc(gw_wh,SD_wh,SDgw_wh):
+        end_date = '2013-02-09 00:00:00'
+        keep = []
+        toss = []
+        for ix, col in enumerate(gw_wh.columns):
+                n = col[0:4]
+                if n == 'ug00':
+                        toss.append(col)
+                else:
+                        keep.append(col)
+        start_dict = {}
+        for ix, col in enumerate(keep):
+                start_dict[col] = [str(SDgw_wh[col].dropna().index[0])]
+        union = {}
+        
+        for ix, col in enumerate(SDgw_wh[keep].columns):
+                union[col] =  [np.shape(SDgw_wh[col].dropna())[0]]
+                union[col].append(np.shape(SDgw_wh[col][start_dict[col][0]:end_date])[0])
+        return union
+                
+        
+
+
+
+        
+
+        
 
