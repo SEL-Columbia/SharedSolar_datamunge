@@ -13,12 +13,14 @@ import pandas as pd
 
 # Open GW and SD data
 def open_SSdata():
-	'''Open gw_wh, gw_cred, SD_wh, SD_cred: in that order'''
+	'''Open gw_wh, gw_cred, SD_wh, SD_cred, SDgw_wh, SDgw_cred: in that order'''
 	gw_wh = pd.read_csv('gw_wh_fix.csv', delimiter = ',', index_col = 0, parse_dates = True)	
 	gw_cred = pd.read_csv('gw_cred.csv', delimiter = ',', index_col = 0, parse_dates = True)
 	SD_wh = pd.read_csv('SD_wh_merged.csv', delimiter = ',', index_col = 0, parse_dates = True)
 	SD_cred = pd.read_csv('SD_cred_merged.csv', delimiter = ',', index_col = 0, parse_dates = True)
-	return gw_wh, gw_cred, SD_wh, SD_cred
+	SDgw_wh = pd.read_csv('SDgw_wh.csv', delimiter = ',', index_col = 0, parse_dates = True)
+	SDgw_cred = pd.read_csv('SDgw_cred.csv', delimiter = ',', index_col = 0, parse_dates = True)
+	return gw_wh, gw_cred, SD_wh, SD_cred, SDgw_wh, SDgw_cred
 
 # Datamap of any DataFrame
 def data_map(wh,color):
@@ -60,6 +62,28 @@ def data_map_comp(wh,demdata,color1,color2):
 	densityplot.set_title('Data Map (GW = Red, SD = Green, Both = Brown)')
 	plt.show()
 
+def make_typday(SDgw_wh):
+        r,c = np.shape(SDgw_wh)
+        typday = np.zeros((24, c))
+        for ix in range(0,24):
+            hour = SDgw_wh.index.hour
+            selector = (hour == ix)
+            typday[ix,:] = SDgw_wh[selector].mean()
+
+        typday = pd.DataFrame(typday, index = range(0,24), columns = SDgw_wh.columns)
+        return typday
+
+def make_maxday(SDgw_wh):
+        r,c = np.shape(SDgw_wh)
+        maxday = np.zeros((24, c))
+        for ix in range(0,24):
+            hour = SDgw_wh.index.hour
+            selector = (hour == ix)
+            maxday[ix,:] = SDgw_wh[selector].max()
+
+        maxday = pd.DataFrame(maxday, index = range(0,24), columns = SDgw_wh.columns)
+        return maxday
+
 def make_m_from_h(hour_data):
 	month_data = hour_data.resample('D', how = 'sum').resample('M',how = 'mean')
 	return month_data,
@@ -84,6 +108,10 @@ def data_aval_perc(gw_wh,SD_wh,SDgw_wh):
         end_date = '2013-02-09 00:00:00'
         keep = []
         toss = []
+        cols  = list(np.sort(list(set(gw_wh.columns) | set(SD_wh.columns) | set(SDgw_wh.columns))))
+        gw_wh = pd.DataFrame(gw_wh, index = gw_wh.index,columns = cols)
+        SD_wh = pd.DataFrame(SD_wh, index = SD_wh.index,columns = cols)
+        SDgw_wh = pd.DataFrame(SDgw_wh, index = SDgw_wh.index,columns = cols)
         for ix, col in enumerate(gw_wh.columns):
                 n = col[0:4]
                 if n == 'ug00':
@@ -93,13 +121,27 @@ def data_aval_perc(gw_wh,SD_wh,SDgw_wh):
         start_dict = {}
         for ix, col in enumerate(keep):
                 start_dict[col] = [str(SDgw_wh[col].dropna().index[0])]
+
+        all_dat = {}
+        gw = {}
+        SD = {}
         union = {}
+        intersect = {}
         
         for ix, col in enumerate(SDgw_wh[keep].columns):
+                all_dat[col] = [np.shape(SDgw_wh[col][start_dict[col][0]:end_date])[0]]
+                gw[col] = [np.shape(gw_wh[col].dropna())[0]]
+                SD[col] = [np.shape(SD_wh[col].dropna())[0]]
                 union[col] =  [np.shape(SDgw_wh[col].dropna())[0]]
-                union[col].append(np.shape(SDgw_wh[col][start_dict[col][0]:end_date])[0])
-        return union
-                
+                intersect[col] = [np.shape(list(set(SD_wh[col].dropna().index) & set(gw_wh[col].dropna().index)))[0]]
+        
+        all_dat = pd.DataFrame(pd.Series(all_dat), columns = ['all_data'])
+        gw =   pd.DataFrame(pd.Series(gw), columns = ['gw'])
+        SD =   pd.DataFrame(pd.Series(SD), columns = ['SD'])
+        union =  pd.DataFrame(pd.Series(union), columns = ['union'])
+        intersect =   pd.DataFrame(pd.Series(intersect), columns = ['intersection'])
+          
+        return   all_dat, gw, SD, union, intersect
         
 
 
