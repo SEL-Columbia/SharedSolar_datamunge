@@ -62,6 +62,23 @@ def data_map_comp(wh,demdata,color1,color2):
 	densityplot.set_title('Data Map (GW = Red, SD = Green, Both = Brown)')
 	plt.show()
 
+def make_purch_rec(cred_DF):
+	cred_ary = np.array(cred_DF);
+	r, c = np.shape(cred_ary)
+	purch_ary = np.zeros((r,c)); purch_ary[:] = np.nan
+	for jx in range(0,c):
+		lastreal = 0
+		for ix in range(0,r):
+			diffs = cred_ary[ix, jx] - lastreal
+			if diffs > 0 :
+				purch_ary[ix+1,jx] = diffs
+			if np.isnan(cred_ary[ix,jx]) == False:
+				lastreal = cred_ary[ix,jx]
+	purch_ary[purch_ary < 100] = np.nan		
+	purch_ary = np.ceil(purch_ary/500.)*500.			
+	purch_rec = pd.DataFrame(purch_ary, index = cred_DF.index, columns = cred_DF.columns)
+	return purch_rec
+
 def make_typday(SDgw_wh):
         r,c = np.shape(SDgw_wh)
         typday = np.zeros((24, c))
