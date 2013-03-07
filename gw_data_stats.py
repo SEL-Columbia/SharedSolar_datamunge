@@ -82,13 +82,16 @@ def make_purch_rec(cred_DF):
 def make_typday(SDgw_wh):
         r,c = np.shape(SDgw_wh)
         typday = np.zeros((24, c))
+        typday_std = np.zeros((24, c))
         for ix in range(0,24):
             hour = SDgw_wh.index.hour
             selector = (hour == ix)
             typday[ix,:] = SDgw_wh[selector].mean()
+            typday_std[ix,:] = SDgw_wh[selector].std()
 
         typday = pd.DataFrame(typday, index = range(0,24), columns = SDgw_wh.columns)
-        return typday
+        typday_std = pd.DataFrame(typday_std, index = range(0,24), columns = SDgw_wh.columns)
+        return typday, typday_std
 
 def make_maxday(SDgw_wh):
         r,c = np.shape(SDgw_wh)
