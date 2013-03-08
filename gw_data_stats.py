@@ -1,9 +1,29 @@
-"""
-gw_data_stats
-SharedSolar
-By: Mitchell Lee
-Began on February 22, 2013
-"""
+
+def gw_data_stats():
+	''' 
+	gw_data_stats
+	SharedSolar
+	By: Mitchell Lee
+	Began on February 22, 2013
+
+
+	A group of functions used to analyze gateway, SD card, and merged 
+	consumption and credit history using pandas. Included functions are: 
+		open_SSdata()
+		data_avl_perc(gw_wh,SD_wh,SDgw_wh)
+		data_map(wh,color)
+		data_map_comp(wh,demdata,color1,color2):
+		data_map_mag(DF, vmin, vmax):
+		make_m_from_h(hour_data):		
+		make_maxday(SDgw_wh):
+		make_month_bplot(month_data)
+		make_purch_rec(cred_DF):
+		make_typday(SDgw_wh):
+		sort_country(DF)
+		sort_mains(DF)
+	'''
+
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,7 +44,7 @@ def open_SSdata():
 
 
 
-def data_aval_perc(gw_wh,SD_wh,SDgw_wh):
+def data_avl_perc(gw_wh,SD_wh,SDgw_wh):
 	'''Import all of the SharedSolar gw, SD, and merged SDgw data. Determine
 	The percentage of all data that we have for SD cards, the gateway,
 	the union of these sets, and the intersection of these sets. '''
@@ -92,7 +112,6 @@ def data_map(wh,color):
 def data_map_comp(wh,demdata,color1,color2):
 	'''data_map(DF1,color1,DF2,color2):
 	Import two DataFrames and plot their overlap'''
-	Import a DataFrame and make a map of data availability
 	import numpy as np
 	import matplotlib.pyplot as plt
 	from matplotlib import colors
@@ -138,23 +157,6 @@ def data_map_mag(DF, vmin, vmax):
 	fig.colorbar(pic).set_label('Average Wh Consumed Daily')
 	dayuse.plot()
 
-
-
-
-def make_maxday(SDgw_wh):
-	'''Import the hourly energy usage of a consumer or mains 	
-	and create a diurnal day of using the maximum energy consumption
-	at each hour over the entire timeseries'''
-    r,c = np.shape(SDgw_wh)
-    maxday = np.zeros((24, c))
-    for ix in range(0,24):
-        hour = SDgw_wh.index.hour
-        selector = (hour == ix)
-        maxday[ix,:] = SDgw_wh[selector].max()
-
-    maxday = pd.DataFrame(maxday, index = range(0,24), columns = SDgw_wh.columns)
-    return maxday
-
 def make_m_from_h(hour_data):
 	""" Take in a DataFrame with hourly resolution. Convert to monthly resolution
 	by first resample('D',sum) then resample('M',mean) to show the average daily energy
@@ -162,6 +164,22 @@ def make_m_from_h(hour_data):
 	hour_data[hour_data >= 1000] = np.nan
 	month_data = hour_data.resample('D', how = 'sum').resample('M',how = 'mean')
 	return month_data,
+
+
+def make_maxday(SDgw_wh):
+	'''Import the hourly energy usage of a consumer or mains and create a diurnal 
+	day of using the maximum energy consumption at each hour over the entire timeseries'''
+	r,c = np.shape(SDgw_wh)
+	maxday = np.zeros((24, c))
+	for ix in range(0,24):
+		hour = SDgw_wh.index.hour
+		selector = (hour == ix)
+		maxday[ix,:] = SDgw_wh[selector].max()
+
+	maxday = pd.DataFrame(maxday, index = range(0,24), columns = SDgw_wh.columns)
+	return maxday
+
+
 	
 def make_month_bplot(month_data):
 	'''Import the hourly energy usage of a consumer or mains 
@@ -204,21 +222,21 @@ def make_purch_rec(cred_DF):
 
 
 def make_typday(SDgw_wh):
-		'''Import the hourly energy usage of a consumer or mains 	
-		and create a typical diurnal day of average energy consumption
-		and associated standard deviation'''
-        r,c = np.shape(SDgw_wh)
-        typday = np.zeros((24, c))
-        typday_std = np.zeros((24, c))
-        for ix in range(0,24):
-            hour = SDgw_wh.index.hour
-            selector = (hour == ix)
-            typday[ix,:] = SDgw_wh[selector].mean()
-            typday_std[ix,:] = SDgw_wh[selector].std()
+	'''Import the hourly energy usage of a consumer or mains 	
+	and create a typical diurnal day of average energy consumption
+	and associated standard deviation'''
+	r, c = np.shape(SDgw_wh)
+	typday = np.zeros((24, c))
+	typday_std = np.zeros((24, c))
+	for ix in range(0,24):
+		hour = SDgw_wh.index.hour
+		selector = (hour == ix)
+		typday[ix,:] = SDgw_wh[selector].mean()
+		typday_std[ix,:] = SDgw_wh[selector].std()
 
-        typday = pd.DataFrame(typday, index = range(0,24), columns = SDgw_wh.columns)
-        typday_std = pd.DataFrame(typday_std, index = range(0,24), columns = SDgw_wh.columns)
-        return typday, typday_std
+	typday = pd.DataFrame(typday, index = range(0,24), columns = SDgw_wh.columns)
+	typday_std = pd.DataFrame(typday_std, index = range(0,24), columns = SDgw_wh.columns)
+	return typday, typday_std
 
 
 def sort_country(DF):
