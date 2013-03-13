@@ -18,6 +18,7 @@ def gw_data_stats():
 		make_maxday(SDgw_wh):
 		make_month_bplot(month_data)
 		make_purch_rec(cred_DF):
+		make_site_dict(DF)
 		make_typday(SDgw_wh):
 		sort_country(DF)
 		sort_mains(DF)
@@ -219,6 +220,35 @@ def make_purch_rec(cred_DF):
 	purch_ary = np.ceil(purch_ary/500.)*500.			
 	purch_rec = pd.DataFrame(purch_ary, index = cred_DF.index, columns = cred_DF.columns)
 	return purch_rec
+
+def make_site_dict(DF):
+	''' import a DataFrame and output a dictionary which includes 
+	each site and a list of operational circuits for that site. Will include
+	a listing for UG05 regardless of it is needed.'''
+	
+	import string
+	import numpy as np
+	import pandas as pd 
+	mains = []
+	circuits = []
+	for jx, column in enumerate(DF.columns):
+		n = int(column.split('_')[1])
+		if n == 0:
+			mains.append(column)
+		else:
+			circuits.append(column)
+
+	site_dict = {}
+	mains.append('ug05_0')
+	site_list = np.sort(mains)
+
+	for ix, site in enumerate(site_list):
+		site_dict[string.split(site,'_')[0]] = []
+
+	for ix, circ in enumerate(circuits):
+		site_dict[string.split(circ,'_')[0]].append(circ)
+	
+	return site_dict
 
 
 def make_typday(SDgw_wh):
