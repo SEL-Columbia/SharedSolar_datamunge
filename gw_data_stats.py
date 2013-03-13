@@ -183,7 +183,7 @@ def make_maxday(SDgw_wh):
 
 	
 def make_month_bplot(month_data):
-	'''Import the hourly energy usage of a consumer or mains 
+	'''Import the monthly energy usage of a consumer or mains 
 	and make a barplot of average daily energy consumption by month'''
 	months = month_data.index.month
 	years = month_data.index.year
