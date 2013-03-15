@@ -95,7 +95,7 @@ def data_avl_perc(gw_wh,SD_wh,SDgw_wh):
 	SD =   pd.DataFrame(pd.Series(SD), columns = ['SD'], dtype = float)
 	union =  pd.DataFrame(pd.Series(union), columns = ['union'], dtype = float)
 	intersect =   pd.DataFrame(pd.Series(intersect), columns = ['intersection'], dtype = float)
-	avl = np.ceil(all_dat.join(gw).join(SD).join(intersect).join(union).sum()/24)  
+	avl = all_dat.join(gw).join(SD).join(intersect).join(union).sum()  
 	perc_avl  = avl/avl[0]
 	perc_avl = pd.DataFrame(avl,columns = ['Days']).join(pd.DataFrame(perc_avl, columns = ['Percent']))
 	return perc_avl  
