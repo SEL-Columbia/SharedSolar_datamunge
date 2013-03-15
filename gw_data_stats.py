@@ -43,6 +43,12 @@ def open_SSdata():
 	SD_cred = pd.read_csv('SD_cred_merged.csv', delimiter = ',', index_col = 0, parse_dates = True)
 	SDgw_wh = pd.read_csv('SDgw_wh.csv', delimiter = ',', index_col = 0, parse_dates = True)
 	SDgw_cred = pd.read_csv('SDgw_cred.csv', delimiter = ',', index_col = 0, parse_dates = True)
+	
+	gw_wh = pd.DataFrame(gw_wh, columns = SDgw_wh.columns)
+	gw_cred = pd.DataFrame(gw_cred, columns = SDgw_wh.columns)
+	SD_wh = pd.DataFrame(SD_wh, columns = SDgw_wh.columns)
+	SD_cred = pd.DataFrame(gw_cred, columns = SDgw_wh.columns)	
+	
 	return gw_wh, gw_cred, SD_wh, SD_cred, SDgw_wh, SDgw_cred
 
 
