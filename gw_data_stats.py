@@ -5,7 +5,9 @@ def gw_data_stats():
 	SharedSolar
 	By: Mitchell Lee
 	Began on February 22, 2013
-
+	Script functions with: 
+	Python 2.7.3, pandas 0.10.0, numpy 1.6.1, matplotlib 1.1.0
+	
 
 	A group of functions used to analyze gateway, SD card, and merged 
 	consumption and credit history using pandas. Included functions are: 
@@ -51,7 +53,7 @@ def data_avl_perc(gw_wh,SD_wh,SDgw_wh):
 	the union of these sets, and the intersection of these sets. '''
 
 	start_date = '2010-12-01 00:00:00'        
-	end_date = '2013-02-09 00:00:00'
+	end_date = '2012-11-01 00:00:00'
 	gw_wh.ix[:start_date] = np.nan; SD_wh.ix[:start_date] = np.nan; SDgw_wh.ix[:start_date] = np.nan
 	keep = []
 	toss = []
@@ -60,14 +62,14 @@ def data_avl_perc(gw_wh,SD_wh,SDgw_wh):
 	SD_wh = pd.DataFrame(SD_wh, index = SD_wh.index,columns = cols)
 	SDgw_wh = pd.DataFrame(SDgw_wh, index = SDgw_wh.index,columns = cols)
 	for ix, col in enumerate(gw_wh.columns):
-			n = col[0:4]
-			if n == 'ug00':
-			        toss.append(col)
-			else:
-			        keep.append(col)
+		n = col[0:4]
+		if n == 'ug00':
+			toss.append(col)
+		else:
+			keep.append(col)
 	start_dict = {}
 	for ix, col in enumerate(keep):
-			start_dict[col] = [str(SDgw_wh[col].dropna().index[0])]
+		start_dict[col] = [str(SDgw_wh[col].dropna().index[0])]
 
 	all_dat = {}
 	gw = {}
@@ -76,18 +78,20 @@ def data_avl_perc(gw_wh,SD_wh,SDgw_wh):
 	intersect = {}
 
 	for ix, col in enumerate(SDgw_wh[keep].columns):
-			all_dat[col] = np.shape(SDgw_wh[col][start_dict[col][0]:end_date])[0]
-			gw[col] = np.shape(gw_wh[col].dropna())[0]
-			SD[col] = np.shape(SD_wh[col].dropna())[0]
-			union[col] =  np.shape(SDgw_wh[col].dropna())[0]
-			intersect[col] = np.shape(list(set(SD_wh[col].dropna().index) & set(gw_wh[col].dropna().index)))[0]
+		all_dat[col] = np.shape(SDgw_wh[col][start_dict[col][0]:end_date])[0]
+		gw[col] = np.shape(gw_wh[col].dropna())[0]
+		SD[col] = np.shape(SD_wh[col].dropna())[0]
+		union[col] =  np.shape(SDgw_wh[col].dropna())[0]
+		intersect[col] = np.shape(list(set(SD_wh[col].dropna().index) & set(gw_wh[col].dropna().index)))[0]
 
-	all_dat = pd.DataFrame(pd.Series(all_dat), columns = ['all_data'])
+	all_dat = pd.DataFrame(pd.Series(all_dat), columns = ['all_possible_data'])
 	gw =   pd.DataFrame(pd.Series(gw), columns = ['gw'], dtype = float)
 	SD =   pd.DataFrame(pd.Series(SD), columns = ['SD'], dtype = float)
 	union =  pd.DataFrame(pd.Series(union), columns = ['union'], dtype = float)
 	intersect =   pd.DataFrame(pd.Series(intersect), columns = ['intersection'], dtype = float)
-	perc_avl = all_dat.join(gw).join(SD).join(union).join(intersect).sum()   
+	avl = all_dat.join(gw).join(SD).join(intersect).join(union).sum()  
+	perc_avl  = avl/avl[0]
+	perc_avl = pd.DataFrame(avl,columns = ['Days']).join(pd.DataFrame(perc_avl, columns = ['Percent']))
 	return perc_avl  
 
 
@@ -233,10 +237,11 @@ def make_site_dict(DF):
 	circuits = []
 	for jx, column in enumerate(DF.columns):
 		n = int(column.split('_')[1])
-		if n == 0:
-			mains.append(column)
-		else:
-			circuits.append(column)
+		if column.split('_')[0] != 'ug00':
+			if n == 0:
+				mains.append(column)
+			else:
+				circuits.append(column)
 
 	site_dict = {}
 	mains.append('ug05_0')
