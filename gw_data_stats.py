@@ -10,6 +10,7 @@ def gw_data_stats():
 	A group of functions used to analyze gateway, SD card, and merged 
 	consumption and credit history using pandas. Included functions are: 
 		open_SSdata()
+		open_SSdata_dly()
 		data_avl_perc(gw_wh,SD_wh,SDgw_wh)
 		data_map(wh,color)
 		data_map_comp(wh,demdata,color1,color2):
@@ -43,7 +44,17 @@ def open_SSdata():
 	SDgw_cred = pd.read_csv('SDgw_cred.csv', delimiter = ',', index_col = 0, parse_dates = True)
 	return gw_wh, gw_cred, SD_wh, SD_cred, SDgw_wh, SDgw_cred
 
-
+# Open GW and SD data with daily resolution
+def open_SSdata_dly():
+	'''Open gw_wh, gw_cred, SD_wh, SD_cred, SDgw_wh, SDgw_cred: in that order
+	USING DAILY RESOLUTION INSTEAD OF HOURLY'''
+	gw_wh_dly = pd.read_csv('gw_wh_fix.csv', delimiter = ',', index_col = 0, parse_dates = True).resample('D', how = 'sum')	
+	gw_cred_dly = pd.read_csv('gw_cred.csv', delimiter = ',', index_col = 0, parse_dates = True).resample('D', how = 'sum')	
+	SD_wh_dly = pd.read_csv('SD_wh_merged.csv', delimiter = ',', index_col = 0, parse_dates = True).resample('D', how = 'sum')	
+	SD_cred_dly = pd.read_csv('SD_cred_merged.csv', delimiter = ',', index_col = 0, parse_dates = True).resample('D', how = 'sum')	
+	SDgw_wh_dly = pd.read_csv('SDgw_wh.csv', delimiter = ',', index_col = 0, parse_dates = True).resample('D', how = 'sum')	
+	SDgw_cred_dly = pd.read_csv('SDgw_cred.csv', delimiter = ',', index_col = 0, parse_dates = True).resample('D', how = 'sum')	
+	return gw_wh_dly, gw_cred_dly, SD_wh_dly, SD_cred_dly, SDgw_wh_dly, SDgw_cred_dly
 
 def data_avl_perc(gw_wh,SD_wh,SDgw_wh):
 	'''Import all of the SharedSolar gw, SD, and merged SDgw data. Determine

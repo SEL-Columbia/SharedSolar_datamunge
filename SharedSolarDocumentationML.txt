@@ -61,9 +61,9 @@ Shared Solar Documentation
 
 	gw_wh_cum.csv - Cumulative gateway wh. Resets removed using 
 		remove_gw_wh_resets.py. Removes energy consumption that 
-		occured between gaps in data and the first measurement that
-		occurs after a gap on data because it is not possible to 
-		know exactly where or if resets occured.  
+		occured between gaps in data. Also removes the first 
+		measurement that occurs after a gap on data because it 
+		is not possible to know exactly where or if resets occured.  
 
 	gw_wh_fix.csv - Wh per hour energy usage as recorded by the gateway
 		as of February 9, 2013. File created by remove_gw_wh_resets.py.
@@ -79,12 +79,12 @@ Shared Solar Documentation
 	SD_cred_merged.csv - allmeterscreditarray_merged.csv combined with Mali credit 
 		from allmeterscreditarray.csv. Credit data at hourly resolution for all 
 		circuits at all hours. The index range is from Jan 1, 2010 to 
-		Dec 31, 2014. 	
+		Dec 31, 2013. 	
 
 	SD_wh_merged.csv -  allmetersdemandarray_merged.csv combined with Mali credit 
 		from allmeterdemandarray.csv. Demand data at hourly resolution for all 
 		circuits at all hours. The index range is from Jan 1, 2010 to 
-		Dec 31, 2014. 
+		Dec 31, 2013. 
 
 	SDgw_cred.csv = combined hourly SD card and gateway credit data.
 		Contains data for all Mali and Uganda circuits.
@@ -209,7 +209,7 @@ figures
 		This file is also saved as a pdf file with the same name. 
 		
 
-.m  files (Scripts and Functions)
+.m  files (Matlab Scripts and Functions)
 
 System Optimization Model
 
@@ -585,22 +585,60 @@ System Optimization Model
 		
 		Current functions include:
 
+		open_SSdata() - Open gw_wh, gw_cred, SD_wh, SD_cred: in that order
+			from 'gw_wh_fix.csv','gw_cred.csv', 'SD_wh_merged.csv', and 
+			'SD_cred_merged.csv'.
+	
+		open_SSdata_dly() - Open gw_wh, gw_cred, SD_wh, SD_cred: in that order
+			from 'gw_wh_fix.csv','gw_cred.csv', 'SD_wh_merged.csv', and 
+			'SD_cred_merged.csv'. OPEN files using daily resolution. 		
+		
+		data_avl_perc(gw_wh,SD_wh,SDgw_wh) -Import all of the 
+			SharedSolar gw, SD, and merged SDgw data. Determine
+			The percentage of all data that we have for SD cards, the gateway,
+			the union of these sets, and the intersection of these sets 		
+
 		datamap() - Spy plot of gw data. 
 
 		data_map_comp() - Spy plot of gw data in one color. Spy plot of SD
 			card data in another color. A third color where they overlap.
 
+		data_map_mag(DF, vmin, vmax) - Import DataFrame and make heatmap of data
+			according to availablity and magnitude.
+			Specify minimum and maximum values for scaling of color
+			Resolution finer than monthly will crash.	
+
 		make_m_from_h(hour_data) - return month_data. Reduces a pandas 
 			dataframe from hourly to monthly resolution. 
 			Finds the average daily energy consumption for each month.  
+
+		make_maxday(SDgw_wh) - Import the hourly energy usage of a consumer or
+			mains and create a diurnal day of using the maximum energy 
+			consumption at each hour over the entire timeseries
 		
 		make_month_bplot(month_data) - Takes in an hourly times series
 			for a particular mains or circuit and makes and produces 
 			a bar plot of average daily energy consumption by month.
 
-		open_SSdata() - Open gw_wh, gw_cred, SD_wh, SD_cred: in that order
-			from 'gw_wh_fix.csv','gw_cred.csv', 'SD_wh_merged.csv', and 
-			'SD_cred_merged.csv'.
+		make_purch_rec(cred_DF) - make a timeseries record of purchases for call 
+			SharedSolar Consumers. Constructs consumer history by 
+			finding increase in credits for each consumer and rounding 
+			up to the nearest increment of 500
+
+		make_site_dict(DF) - import a DataFrame and output a dictionary which 
+			includes each site and a list of operational circuits for that site. 
+			Will include a listing for UG05 regardless of it is needed.
+
+		make_typday(SDgw_wh) - Import the hourly energy usage of a 
+			consumer or mains and create a typical diurnal day of 
+			average energy consumption and associated standard deviation
+
+		sort_country(DF) - Sort SharedSolar DF into ml_DF and ug_DF
+
+		sort_mains(DF) - Retun two DFs one of mains and one of circuits 
+			from original DF
+
+		
 		
 	
 	hourly2mat.py - Read all hourly csv files and convert them into two
