@@ -37,7 +37,7 @@ import pandas as pd
 
 # Open GW and SD data
 def open_SSdata():
-	'''Open gw_wh, gw_cred, SD_wh, SD_cred, SDgw_wh, SDgw_cred: in that order'''
+	'''Open gw_wh_dly, gw_cred_dly, SD_wh_dly, SD_cred_dly, SDgw_wh_dly, SDgw_cred_dly: in that order'''
 	gw_wh = pd.read_csv('gw_wh_fix.csv', delimiter = ',', index_col = 0, parse_dates = True)	
 	gw_cred = pd.read_csv('gw_cred.csv', delimiter = ',', index_col = 0, parse_dates = True)
 	SD_wh = pd.read_csv('SD_wh_merged.csv', delimiter = ',', index_col = 0, parse_dates = True)
