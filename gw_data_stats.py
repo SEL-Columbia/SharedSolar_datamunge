@@ -37,7 +37,7 @@ import pandas as pd
 
 # Open GW and SD data
 def open_SSdata():
-	'''Open gw_wh_dly, gw_cred_dly, SD_wh_dly, SD_cred_dly, SDgw_wh_dly, SDgw_cred_dly: in that order'''
+	'''Open gw_wh, gw_cred, SD_wh, SD_cred, SDgw_wh, SDgw_cred in that order'''
 	gw_wh = pd.read_csv('gw_wh_fix.csv', delimiter = ',', index_col = 0, parse_dates = True)	
 	gw_cred = pd.read_csv('gw_cred.csv', delimiter = ',', index_col = 0, parse_dates = True)
 	SD_wh = pd.read_csv('SD_wh_merged.csv', delimiter = ',', index_col = 0, parse_dates = True)
@@ -54,7 +54,7 @@ def open_SSdata():
 
 # Open GW and SD data with daily resolution
 def open_SSdata_dly():
-	'''Open gw_wh_dly, gw_cred_dly, SD_wh_dly SD_cred_dly, SDgw_wh_dly, SDgw_cred_dly: in that order
+	'''Open gw_wh_dly, gw_cred_dly, SD_wh_dly, SD_cred_dly, SDgw_wh_dly, SDgw_cred_dly: in that order
 	USING DAILY RESOLUTION INSTEAD OF HOURLY'''
 	gw_wh_dly = pd.read_csv('gw_wh_fix.csv', delimiter = ',', index_col = 0, parse_dates = True).resample('D', how = 'sum')	
 	gw_cred_dly = pd.read_csv('gw_cred.csv', delimiter = ',', index_col = 0, parse_dates = True).resample('D', how = 'sum')	
@@ -314,6 +314,28 @@ def sort_country(DF):
 	ug_DF = DF[ug]
 
 	return ml_DF, ug_DF
+
+def sort_daynight(DF):
+	''' Sort energy usage data by Day and Night. 
+	Then downsample to daily resolution. Not this is NOT 
+	done using insolation Data. Day and night are defined according
+	to the current SharedSolar pricing strategy in Uganda.
+	6:00 AM to 6:00 PM are considered day time.  '''
+
+	import numpy as np
+	import pandas as pd
+	before_dawn = np.argwhere(DF.index.hour < 6)
+	after_dawn = np.argwhere(DF.index.hour >= 6)
+	before_dusk = np.argwhere(DF.index.hour < 18)
+	after_dusk = np.argwhere(DF.index.hour >= 18)
+	
+	day = np.intersect1d(after_dawn, before_dusk)
+	night = np.union1d(before_dawn,after_dusk)
+	
+	day_DF = pd.DataFrame(DF.ix[DF.index[day]],index = DF.index).resample('D',how = 'sum')
+	night_DF = pd.DataFrame(DF.ix[DF.index[night]], index = DF.index).resample('D', how = 'sum')
+
+	return day_DF, night_DF
 
 def sort_mains(DF):
 	''' Retun two DFs one of mains and one of circuits from original DF'''
