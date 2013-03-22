@@ -24,6 +24,7 @@ def gw_data_stats():
 		make_site_dict(DF)
 		make_typday(SDgw_wh):
 		sort_country(DF)
+		sort_daynight(DF)		
 		sort_mains(DF)
 	'''
 
@@ -48,7 +49,7 @@ def open_SSdata():
 	gw_wh = pd.DataFrame(gw_wh, columns = SDgw_wh.columns)
 	gw_cred = pd.DataFrame(gw_cred, columns = SDgw_wh.columns)
 	SD_wh = pd.DataFrame(SD_wh, columns = SDgw_wh.columns)
-	SD_cred = pd.DataFrame(gw_cred, columns = SDgw_wh.columns)	
+	SD_cred = pd.DataFrame(SD_cred, columns = SDgw_wh.columns)	
 	
 	return gw_wh, gw_cred, SD_wh, SD_cred, SDgw_wh, SDgw_cred
 
@@ -187,8 +188,8 @@ def data_map_mag(DF, vmin, vmax):
 
 def make_m_from_h(hour_data):
 	""" Take in a DataFrame with hourly resolution. Convert to monthly resolution
-	by first resample('D',sum) then resample('M',mean) to show the average daily energy
-	use in each month"""
+	by first resample('D',sum) then resample('M',mean) to show the average 
+	daily energy use in each month"""
 	hour_data[hour_data >= 1000] = np.nan
 	month_data = hour_data.resample('D', how = 'sum').resample('M',how = 'mean')
 	return month_data,
@@ -212,6 +213,11 @@ def make_maxday(SDgw_wh):
 def make_month_bplot(month_data):
 	'''Import the monthly energy usage of a consumer or mains 
 	and make a barplot of average daily energy consumption by month'''
+	import numpy as np
+	import pandas as pd
+	import matplotlib.pyplot as plt
+	import matplotlib as mpl
+
 	months = month_data.index.month
 	years = month_data.index.year
 	month_names = []
