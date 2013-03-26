@@ -17,6 +17,7 @@ def gw_data_stats():
 		data_map(wh,color)
 		data_map_comp(wh,demdata,color1,color2):
 		data_map_mag(DF, vmin, vmax):
+		mains_to_circ_sum(DF,country)
 		make_m_from_h(hour_data):		
 		make_maxday(SDgw_wh):
 		make_month_bplot(month_data)
@@ -172,26 +173,80 @@ def data_map_mag(DF, vmin, vmax):
 	import pandas as pd
 	import matplotlib.pyplot as plt
 	import matplotlib as mpl
+	import time
+	
+	dateaxis = []
+	for ix, name in enumerate(DF.index):
+		dateaxis.append(name.strftime("%Y-%m-%d"))
+	
+	
 	fig = plt.figure()
 	dayuse = fig.add_subplot(1,1,1)
 	pic = dayuse.imshow(DF, aspect = 'auto', cmap= mpl.cm.jet, vmin = vmin, vmax= vmax)
 	dayuse.set_xticks(range(0,np.shape(DF)[-1]))
 	dayuse.set_xticklabels(DF.columns)
-	dayuse.set_yticks(range(0,np.shape(DF)[0]))
-	dayuse.set_yticklabels(DF.index)
-	dayuse.set_title('Average Daily Energy Consumption over Time')
+	dayuse.set_yticks(range(0,np.shape(DF)[0],14))
+	dayuse.set_yticklabels(dateaxis[0:np.shape(DF)[0]:14])
+	#dayuse.set_title('Maximum Daily Energy Consumption over Time')
 	dayuse.set_xlabel('Location')
 	dayuse.set_ylabel('Month')
 	pic.set_interpolation('nearest')
-	fig.colorbar(pic).set_label('Average Wh Consumed Daily')
+	fig.colorbar(pic).set_label('Wh/day')
 	dayuse.plot()
 
-def make_m_from_h(hour_data):
-	""" Take in a DataFrame with hourly resolution. Convert to monthly resolution
-	by first resample('D',sum) then resample('M',mean) to show the average 
-	daily energy use in each month"""
+	
+def mains_to_circ_sum(DF,country):
+	''' Create a plot which graphs the sum of all circuits (x-axis) versus the 
+		power as measured from the mains.
+		DF = DataFrame of energy usage
+		country = country of interest 'ML' or 'UG'
+		
+		mains, circuits = mains_to_circ_sum(DF,country)
+	'''
+
+	import numpy as np
+	import pandas as pd
+	import matplotlib.pyplot as plt
+	
+	if country == 'UG':
+		country = 1
+	elif country =='ML':
+		country = 0
+	else:
+		print "not valid country"
+	
+	site_dict = make_site_dict(sort_country(DF)[country])
+	mains = sort_mains(sort_country(DF)[country])[0]
+	if ('ug00_0' in mains.columns) == True:
+		del mains['ug00_0'] 
+	
+	circuits = pd.DataFrame(index = DF.index)
+	for ix, col in enumerate(np.sort(site_dict.keys())):
+		circ_temp = pd.DataFrame(DF[site_dict[col]].sum(axis = 1), columns = [col])
+		circuits = circuits.join(circ_temp)
+	'''
+	if ('ug05' in circuits) == True:
+		del circuits['ug05']
+	
+	if ('ug05_0' in mains) == True:
+		del mains['ug05_0']
+	mains.columns = circuits.columns
+	'''
+	plt.plot(circuits,mains, ls = ' ', marker = 'x')
+	plt.legend(circuits.columns)
+	plt.xlabel('Sum of Circuits Energy Use (Wh)')
+	plt.ylabel('Mains Energy Use (Wh)')
+	plt.title('Mains Energy Use vs Sum of Circuits')
+	return mains, circuits
+	
+	
+def make_m_from_h(hour_data, how):
+	''' Take in a DataFrame with hourly resolution. Convert to monthly resolution
+	by first resample('D',sum) then resample('M',how) to show the average, max, min, or median 
+	daily energy use in each month.'''
+	
 	hour_data[hour_data >= 1000] = np.nan
-	month_data = hour_data.resample('D', how = 'sum').resample('M',how = 'mean')
+	month_data = hour_data.resample('D', how = 'sum').resample('M',how = how)
 	return month_data,
 
 
