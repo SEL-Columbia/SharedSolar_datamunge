@@ -18,6 +18,7 @@ def gw_data_stats():
 		data_map_comp(wh,demdata,color1,color2):
 		data_map_mag(DF, vmin, vmax):
 		mains_to_circ_sum(DF,country)
+		make_bin_quantile(DF, bin, quant)
 		make_m_from_h(hour_data):		
 		make_maxday(SDgw_wh):
 		make_month_bplot(month_data)
@@ -177,7 +178,7 @@ def data_map_mag(DF, vmin, vmax):
 	
 	dateaxis = []
 	for ix, name in enumerate(DF.index):
-		dateaxis.append(name.strftime("%Y-%m-%d"))
+		dateaxis.append(name.strftime("%Y-%m"))#-%d"))
 	
 	
 	fig = plt.figure()
@@ -185,10 +186,10 @@ def data_map_mag(DF, vmin, vmax):
 	pic = dayuse.imshow(DF, aspect = 'auto', cmap= mpl.cm.jet, vmin = vmin, vmax= vmax)
 	dayuse.set_xticks(range(0,np.shape(DF)[-1]))
 	dayuse.set_xticklabels(DF.columns)
-	dayuse.set_yticks(range(0,np.shape(DF)[0],14))
-	dayuse.set_yticklabels(dateaxis[0:np.shape(DF)[0]:14])
+	dayuse.set_yticks(range(0,np.shape(DF)[0],28))
+	dayuse.set_yticklabels(dateaxis[0:np.shape(DF)[0]:28])
 	#dayuse.set_title('Maximum Daily Energy Consumption over Time')
-	dayuse.set_xlabel('Location')
+	dayuse.set_xlabel('Site')
 	dayuse.set_ylabel('Month')
 	pic.set_interpolation('nearest')
 	fig.colorbar(pic).set_label('Wh/day')
@@ -239,6 +240,24 @@ def mains_to_circ_sum(DF,country):
 	plt.title('Mains Energy Use vs Sum of Circuits')
 	return mains, circuits
 	
+def make_bin_quantile(DF, bin, quant):
+	''' Create a DataFrame of consumer energy usage. Each element in the dataframe is 
+	the specified qunatile of energy usage over the specifed bin size. 
+	
+	For example make_month_quantile(SD_wh,'M', 0.90) would give the 90th percentile of energy demand 
+	in each month according to the SD card data. 
+	'''
+	
+	import numpy as np
+	import pandas as dp
+	from pandas.tseries.resample import TimeGrouper
+	
+	DF = DF.resample('D', how = 'sum')
+	DF = DF.groupby(TimeGrouper(bin))
+	DF = DF.quantile(quant)
+	DF = DF.unstack()
+	return DF
+	
 	
 def make_m_from_h(hour_data, how):
 	''' Take in a DataFrame with hourly resolution. Convert to monthly resolution
@@ -288,23 +307,7 @@ def make_month_bplot(month_data):
 	month_plot.bar(range(0,48), month_data.astype(float), align = 'center')
 	return month_plot, month_names
 
-def make_bin_quantile(DF, bin, quant):
-	''' Create a DataFrame of consumer energy usage. Each element in the dataframe is 
-	the specified qunatile of energy usage over the specifed bin size. 
-	
-	For example make_month_quantile(SD_wh,'M', 0.90) would give the 90th percentile of energy demand 
-	in each month according to the SD card data. 
-	'''
-	
-	import numpy as np
-	import pandas as dp
-	from pandas.tseries.resample import TimeGrouper
-	
-	DF = DF.resample('D', how = 'sum')
-	DF = DF.groupby(TimeGrouper(bin))
-	DF = DF.quantile(quant)
-	DF = DF.unstack()
-	return DF
+
 	
 def make_purch_rec(cred_DF):
 	'''make a timeseries record of purchases for call SharedSolar Consumers
